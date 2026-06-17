@@ -42,7 +42,7 @@ Use `trawl` day to day; reach for `trawl-global` when you want the global hotkey
 ## Install
 
 ```bash
-npm install -g trawl     # installs both `trawl` and `trawl-global`
+npm install -g B33pBeeps/trawl     # installs both `trawl` and `trawl-global`
 ```
 
 ## Launch it
