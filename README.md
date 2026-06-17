@@ -55,7 +55,7 @@ desktop, can pop over it) and in **which directory** they read.
 |---|---|---|
 | terminal / shell key | no, only at the prompt | your shell |
 | tmux popup key | yes, if chats run in tmux | the pane |
-| `trawl-global` | **yes** | wherever it's launched |
+| `trawl-global` | **yes** | the focused terminal |
 
 ### Terminal (shell prompt)
 
@@ -85,21 +85,20 @@ prefix (`prefix` then `x`) if you'd rather keep Ctrl-X.
 
 ### System hotkey (`trawl-global`)
 
-The cross-terminal way to pop the menu over a running chat. `trawl-global` opens
-the menu for **the directory it's launched in**, so bind it where that dir is
-your project:
+Bind one desktop key to `trawl-global`. It pops the menu in a floating window
+over any app, even a running chat. Use **Super+X** (a global Ctrl+X gets stolen
+from every app).
 
-- **Terminal-level keybind** (best: in-chat *and* the right cwd). If your terminal
-  can launch with its current directory, bind it there. kitty, in `kitty.conf`:
-  ```
-  map ctrl+x launch --type=os-window --cwd=current trawl
-  ```
-  (wezterm and ghostty have equivalents.) Caught by the terminal above the running
-  chat, and inherits the chat's cwd.
-- **Desktop / WM hotkey** to `trawl-global`. Use **Super+X** (a global Ctrl+X gets
-  stolen from every app). Note a desktop shortcut launches from your home
-  directory, so run it from the terminal or use a terminal-level bind when you want
-  the project's cwd.
+- It renders in whatever terminal you already have open (or any installed one).
+  Force one with `TRAWL_TERMINAL=foot` if you like.
+- It scopes to the **focused terminal's directory**: trawl-global asks your
+  compositor which window is focused and reads that terminal's cwd. Works out of
+  the box on **Hyprland, sway, X11, KDE, macOS, and Windows**.
+- **GNOME (Wayland)** blocks focus info for unprivileged apps, so install the
+  [Window Calls Extended](https://extensions.gnome.org/extension/4974/window-calls-extended/)
+  GNOME extension and it works the same. Without it, a desktop hotkey falls back
+  to your home dir (run `trawl-global` from the terminal, or bind it in a
+  terminal, to use that cwd instead).
 
 | OS / desktop | hotkey → command `trawl-global` |
 |---|---|

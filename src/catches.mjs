@@ -1,9 +1,22 @@
 // Aggregate catches across agents for a cwd: merge, recency-sort, dedupe.
-import { readClaude } from "./sources/claude.mjs";
-import { readCodex } from "./sources/codex.mjs";
+import { statSync } from "node:fs";
+import { readClaude, recentClaudeSessions } from "./sources/claude.mjs";
+import { readCodex, recentCodexSessions } from "./sources/codex.mjs";
 import { dedupe } from "./extract.mjs";
 
 const byTsDesc = (a, b) => (b.ts || 0) - (a.ts || 0);
+
+// The cwd of the most recently active chat (Claude or Codex). A desktop hotkey
+// can't read the focused terminal's cwd (Wayland blocks it), so trawl-global
+// uses this: the session written most recently is the chat you're working in,
+// and it follows you when you switch chats.
+export function activeCwd() {
+  const mt = (f) => { try { return statSync(f).mtimeMs; } catch { return 0; } };
+  const cands = [...recentClaudeSessions(1), ...recentCodexSessions(1)]
+    .map((s) => ({ cwd: s.cwd, mtime: mt(s.file) }))
+    .sort((a, b) => b.mtime - a.mtime);
+  return cands[0]?.cwd || null;
+}
 
 // Exactly the current directory — no walking up or down.
 export function gather(cwd = process.cwd()) {
