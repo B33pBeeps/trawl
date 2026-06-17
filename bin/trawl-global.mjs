@@ -18,13 +18,14 @@ function which(bin) {
   return null;
 }
 
-// Open the menu for the directory trawl-global was launched in. Run through a
-// LOGIN shell so `trawl` is on PATH even when the launcher's environment is
-// minimal. (The spawned terminal also inherits this cwd; --cwd makes it explicit.)
+// Open the menu for the directory trawl-global was launched in. Run through an
+// INTERACTIVE shell (-i) so it gets the same PATH your terminal has — a desktop
+// hotkey launches with a minimal environment, and tools like fzf often live on a
+// PATH set up in .zshrc/.bashrc (interactive), not just .zshenv/.profile (login).
 const SHELL = process.env.SHELL || "/bin/bash";
 const CWD = process.cwd().replace(/'/g, "'\\''");
 const INNER = `exec trawl --cwd '${CWD}'`;
-const run = [SHELL, "-lc", INNER];
+const run = [SHELL, "-ic", INNER];
 
 const W = 900, H = 520; // window size hint where supported
 const TERMINALS = [
