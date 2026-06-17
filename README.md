@@ -1,0 +1,146 @@
+# trawl
+
+Trawl the **urls, file paths, commands, and plans** out of your AI coding chats.
+It reads your **Claude Code** and **Codex CLI** sessions and drops the good bits
+into fzf. One key, fuzzy-pick, enter opens a url or copies a command, plan, or path.
+
+```
+[url]  https://github.com/you/repo/pull/42
+[cmd]  npm run build && npm test
+[path] src/server/router.ts:88
+[plan] # Refactor the auth flow
+```
+
+---
+
+## What it is
+
+- A tiny CLI that reads your Claude Code and Codex session transcripts and drops
+  the useful bits into fzf. No daemon, no config.
+- **Commands** the agent gave you to run, lifted from its messages.
+- **Plans** it proposed: Claude's plan-mode plan, Codex's `Plan` item.
+- **Urls and paths** from across the chat.
+- **Enter** opens a url; everything else copies. `ctrl-y` always copies.
+- Scoped to the chat in the current directory. Any terminal, tmux or not.
+
+## Two commands
+
+One package, two binaries:
+
+| | what it is | works *inside* a running chat? |
+|---|---|---|
+| **`trawl`** | the menu. Run it in a terminal, or bind a shell / tmux key to it. | only via tmux (below) |
+| **`trawl-global`** | an OS-level launcher. Bind one key; it pops the menu over **any** app, even a running Codex/Claude TUI. | **yes** |
+
+Use `trawl` day to day; reach for `trawl-global` when you want the global hotkey.
+
+## Requirements
+
+- **[fzf](https://github.com/junegunn/fzf)** for the menu UI. Required, on PATH.
+- **Node 18+**.
+
+## Install
+
+```bash
+npm install -g trawl     # installs both `trawl` and `trawl-global`
+```
+
+## Launch it
+
+Three ways to fire trawl. They differ in **whether they work while a chat is
+running** (a chat's TUI owns the keyboard, so only a layer above it, tmux or the
+desktop, can pop over it) and in **which directory** they read.
+
+| method | works in-chat? | reads the dir of |
+|---|---|---|
+| terminal / shell key | no, only at the prompt | your shell |
+| tmux popup key | yes, if chats run in tmux | the pane |
+| `trawl-global` | **yes** | wherever it's launched |
+
+### Terminal (shell prompt)
+
+Fires at the prompt, like fzf's `Ctrl-R`.
+
+**zsh**, in `~/.zshrc`:
+```bash
+__trawl() { command trawl </dev/tty >/dev/tty 2>&1; zle reset-prompt }
+zle -N __trawl
+bindkey '^X' __trawl
+```
+
+**bash**, in `~/.bashrc`:
+```bash
+bind -x '"\C-x": trawl'
+```
+
+### tmux popup
+
+Works *inside* a chat if you run Codex/Claude in tmux. tmux catches the key above
+the program. In `~/.tmux.conf`:
+```tmux
+bind -n C-x display-popup -E -w 75% -h 60% -d "#{pane_current_path}" "trawl"
+```
+`-n` makes Ctrl-X global across panes (taken from vim etc.). Drop it and use your
+prefix (`prefix` then `x`) if you'd rather keep Ctrl-X.
+
+### System hotkey (`trawl-global`)
+
+The cross-terminal way to pop the menu over a running chat. `trawl-global` opens
+the menu for **the directory it's launched in**, so bind it where that dir is
+your project:
+
+- **Terminal-level keybind** (best: in-chat *and* the right cwd). If your terminal
+  can launch with its current directory, bind it there. kitty, in `kitty.conf`:
+  ```
+  map ctrl+x launch --type=os-window --cwd=current trawl
+  ```
+  (wezterm and ghostty have equivalents.) Caught by the terminal above the running
+  chat, and inherits the chat's cwd.
+- **Desktop / WM hotkey** to `trawl-global`. Use **Super+X** (a global Ctrl+X gets
+  stolen from every app). Note a desktop shortcut launches from your home
+  directory, so run it from the terminal or use a terminal-level bind when you want
+  the project's cwd.
+
+| OS / desktop | hotkey → command `trawl-global` |
+|---|---|
+| **Linux · GNOME** | Settings → Keyboard → View and Customize Shortcuts → Custom Shortcuts → **+** → Command `trawl-global`, set **Super+X** |
+| **Linux · Hyprland** | `bind = SUPER, X, exec, trawl-global` |
+| **Linux · KDE** | System Settings → Shortcuts → Custom Shortcuts → Command/URL → `trawl-global` |
+| **Linux · sway / i3** | `bindsym $mod+x exec trawl-global` |
+| **macOS** | [skhd](https://github.com/koekeishiya/skhd) (`cmd - x : trawl-global`), Hammerspoon, or Raycast → `trawl-global` |
+| **Windows** | PowerToys or AutoHotkey hotkey → `trawl-global` |
+
+If the desktop can't find `trawl-global` by name, symlink it onto a standard path:
+```bash
+ln -sf "$(command -v trawl-global)" ~/.local/bin/trawl-global
+ln -sf "$(command -v trawl)" ~/.local/bin/trawl
+```
+
+## In the menu
+
+| key | action |
+|---|---|
+| `enter` | open a url · copy a command / plan / path |
+| `ctrl-y` | copy the selection |
+| `alt-u` / `alt-p` / `alt-c` / `alt-l` | filter to urls / paths / cmds / plans |
+| `alt-a` | show all |
+| type | fuzzy-filter |
+
+No agent session for the directory and the menu just says **not in a chat**.
+
+## CLI
+
+```bash
+trawl                 # menu for the current directory
+trawl --cwd <dir>     # menu for a specific directory
+```
+
+## Config
+
+- **`TRAWL_CLIP=native`** copies with `wl-copy` / `xclip` / `pbcopy` instead of
+  OSC52. Default is OSC52 (an escape to the terminal) so nothing lingers in the
+  background to block input or keep a popup window open.
+
+## License
+
+Personal project. MIT - use it, fork it, do whatever.

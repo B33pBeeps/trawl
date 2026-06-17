@@ -1,0 +1,36 @@
+{
+  "name": "trawl",
+  "version": "0.1.0",
+  "description": "Trawl urls, paths, commands and the last plan out of your Claude/Codex agent sessions — one keybind, fzf menu, any terminal.",
+  "type": "module",
+  "bin": {
+    "trawl": "bin/trawl.mjs",
+    "trawl-global": "bin/trawl-global.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "cli",
+    "fzf",
+    "claude",
+    "codex",
+    "tmux",
+    "scrollback",
+    "agent"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/B33pBeeps/trawl.git"
+  }
+}
