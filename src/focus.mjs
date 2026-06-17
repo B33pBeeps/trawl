@@ -114,15 +114,13 @@ function swayPid() {
 const x11Pid = () => num(out("xdotool", ["getactivewindow", "getwindowpid"]));
 const kdePid = () => num(out("kdotool", ["getactivewindow", "getwindowpid"]));
 function gnomeExtPid() {
-  // "Window Calls Extended" exposes a List of windows incl. focus + pid.
+  // "Window Calls Extended" (window-calls-extended@hseliger.eu) exposes a direct
+  // FocusPID method returning the focused window's PID. Needs the extension
+  // installed + enabled (GNOME exposes nothing for this otherwise).
   const j = out("gdbus", ["call", "--session", "--dest", "org.gnome.Shell.Extensions.Windows",
-    "--object-path", "/org/gnome/Shell/Extensions/Windows", "--method", "org.gnome.Shell.Extensions.Windows.List"]);
-  const m = j && j.match(/'(\[.*\])'/s);
-  if (!m) return null;
-  try {
-    const win = JSON.parse(m[1]).find((w) => w.focus || w.has_focus);
-    return win ? win.pid || null : null;
-  } catch { return null; }
+    "--object-path", "/org/gnome/Shell/Extensions/Windows", "--method", "org.gnome.Shell.Extensions.Windows.FocusPID"]);
+  const m = j && j.match(/\d+/); // "(uint32 12345,)" or "(12345,)"
+  return m ? Number(m[0]) : null;
 }
 function macPid() {
   return num(out("osascript", ["-e", 'tell application "System Events" to get unix id of first process whose frontmost is true']));

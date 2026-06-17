@@ -94,11 +94,17 @@ from every app).
 - It scopes to the **focused terminal's directory**: trawl-global asks your
   compositor which window is focused and reads that terminal's cwd. Works out of
   the box on **Hyprland, sway, X11, KDE, macOS, and Windows**.
-- **GNOME (Wayland)** blocks focus info for unprivileged apps, so install the
-  [Window Calls Extended](https://extensions.gnome.org/extension/4974/window-calls-extended/)
-  GNOME extension and it works the same. Without it, a desktop hotkey falls back
-  to your home dir (run `trawl-global` from the terminal, or bind it in a
-  terminal, to use that cwd instead).
+- **GNOME (Wayland)** blocks focus info for unprivileged apps, so it needs one
+  extension: **[Window Calls Extended](https://extensions.gnome.org/extension/4974/window-calls-extended/)**
+  (`window-calls-extended@hseliger.eu`). trawl-global calls its `FocusPID` D-Bus
+  method to find the focused window. Install it, then **log out and back in once**
+  (Wayland won't load a freshly-installed extension into the running shell):
+  ```bash
+  gnome-extensions enable window-calls-extended@hseliger.eu   # after install + relogin
+  ```
+  Without it, a desktop hotkey falls back to your home dir — run `trawl-global`
+  from the terminal (where the cwd is already right) instead. X11 GNOME doesn't
+  need the extension (`xdotool` works there).
 
 | OS / desktop | hotkey → command `trawl-global` |
 |---|---|
