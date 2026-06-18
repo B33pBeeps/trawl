@@ -4,12 +4,7 @@ Trawl the **urls, file paths, commands, and plans** out of your AI coding chats.
 It reads your **Claude Code** and **Codex CLI** sessions and drops the good bits
 into fzf. One key, fuzzy-pick, enter opens a url or copies a command, plan, or path.
 
-```
-[url]  https://github.com/you/repo/pull/42
-[cmd]  npm run build && npm test
-[path] src/server/router.ts:88
-[plan] # Refactor the auth flow
-```
+![trawl in action](docs/demo.gif)
 
 ---
 
@@ -132,6 +127,18 @@ ln -sf "$(command -v trawl)" ~/.local/bin/trawl
 | type | fuzzy-filter |
 
 No agent session for the directory and the menu just says **not in a chat**.
+
+The full menu — every catch from the current chat, tagged by type:
+
+![trawl menu](docs/menu.png)
+
+Type to fuzzy-filter across every type at once:
+
+![fuzzy filter](docs/filter.png)
+
+Or `alt-c` / `alt-p` / `alt-u` / `alt-l` to scope to one type:
+
+![filter to commands](docs/commands.png)
 
 ## CLI
 
